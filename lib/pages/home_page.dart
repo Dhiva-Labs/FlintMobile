@@ -4,8 +4,9 @@ import '../models/browser.dart';
 import '../models/tab.dart';
 import '../theme.dart';
 
-/// The Flint new-tab screen: brand, search box, speed-dial of top sites,
-/// and the privacy pitch.
+/// The Flint new-tab screen: brand, speed-dial of top sites (with a real empty
+/// state), and the privacy pitch. Search lives in the always-present address
+/// bar above, so there's no second search box here.
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.browser, required this.tab});
   final Browser browser;
@@ -17,82 +18,119 @@ class HomePage extends StatelessWidget {
     final top = browser.store.topSites(limit: 8);
     return Container(
       color: cs.surface,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const _FlintMark(size: 40),
-              const SizedBox(width: 10),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: 'Flint',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    color: cs.onSurface,
-                    letterSpacing: -0.5,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Brand(incognito: tab.incognito),
+                      const SizedBox(height: 36),
+                      if (top.isNotEmpty)
+                        _SpeedDial(sites: top, browser: browser)
+                      else
+                        _EmptyDial(onSearch: () => browser.requestOmniEdit?.call()),
+                    ],
                   ),
                 ),
-                const TextSpan(
-                  text: '.',
-                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: flintOrange),
-                ),
-              ])),
-              if (tab.incognito) ...[
-                const SizedBox(width: 10),
-                Icon(Icons.visibility_off, color: cs.onSurfaceVariant, size: 22),
-              ],
-            ],
-          ),
-          const SizedBox(height: 28),
-          Material(
-            color: cs.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(28),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(28),
-              onTap: () => browser.requestOmniEdit?.call(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                child: Row(children: [
-                  Icon(Icons.search, color: cs.onSurfaceVariant, size: 22),
-                  const SizedBox(width: 12),
-                  Text('Search or enter address',
-                      style: TextStyle(color: cs.onSurfaceVariant, fontSize: 15.5)),
-                ]),
               ),
             ),
-          ),
-          const SizedBox(height: 34),
-          if (top.isNotEmpty)
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 18,
-              runSpacing: 18,
-              children: [
-                for (final origin in top) _SpeedDialTile(origin: origin, browser: browser),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 22, left: 20, right: 20),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 18,
+                runSpacing: 8,
+                children: [
+                  _Pill('Ad & tracker blocking', cs),
+                  _Pill('Private tabs', cs),
+                  _Pill('Reader mode', cs),
+                ],
+              ),
             ),
-          const SizedBox(height: 40),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 18,
-            runSpacing: 8,
-            children: [
-              _Pill('Ad & tracker blocking', cs),
-              _Pill('Private tabs', cs),
-              _Pill('Reader mode', cs),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _SpeedDialTile extends StatelessWidget {
-  const _SpeedDialTile({required this.origin, required this.browser});
+class _Brand extends StatelessWidget {
+  const _Brand({required this.incognito});
+  final bool incognito;
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const _FlintMark(size: 42),
+        const SizedBox(width: 12),
+        Text.rich(TextSpan(children: [
+          TextSpan(
+            text: 'Flint',
+            style: TextStyle(
+                fontSize: 36, fontWeight: FontWeight.w800, color: cs.onSurface, letterSpacing: -0.5),
+          ),
+          const TextSpan(
+              text: '.', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: flintOrange)),
+        ])),
+        if (incognito) ...[
+          const SizedBox(width: 12),
+          Icon(Icons.visibility_off, color: cs.onSurfaceVariant, size: 22),
+        ],
+      ],
+    );
+  }
+}
+
+class _EmptyDial extends StatelessWidget {
+  const _EmptyDial({required this.onSearch});
+  final VoidCallback onSearch;
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        Icon(Icons.explore_outlined, size: 30, color: cs.onSurfaceVariant.withValues(alpha: 0.7)),
+        const SizedBox(height: 12),
+        Text(
+          'Sites you visit most will show up here.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14.5),
+        ),
+        const SizedBox(height: 16),
+        FilledButton.tonalIcon(
+          onPressed: onSearch,
+          icon: const Icon(Icons.search, size: 18),
+          label: const Text('Search the web'),
+        ),
+      ],
+    );
+  }
+}
+
+class _SpeedDial extends StatelessWidget {
+  const _SpeedDial({required this.sites, required this.browser});
+  final List<String> sites;
+  final Browser browser;
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 18,
+      runSpacing: 18,
+      children: [for (final origin in sites) _DialTile(origin: origin, browser: browser)],
+    );
+  }
+}
+
+class _DialTile extends StatelessWidget {
+  const _DialTile({required this.origin, required this.browser});
   final String origin;
   final Browser browser;
 
@@ -152,11 +190,7 @@ class _FlintMark extends StatelessWidget {
   final double size;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _FlamePainter()),
-    );
+    return SizedBox(width: size, height: size, child: CustomPaint(painter: _FlamePainter()));
   }
 }
 

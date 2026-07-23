@@ -51,8 +51,20 @@ class Browser extends ChangeNotifier {
 
   void selectTab(int index) {
     if (index < 0 || index >= tabs.length) return;
+    if (index != activeIndex) captureThumb(active); // snapshot the outgoing tab
     activeIndex = index;
     notifyListeners();
+  }
+
+  /// Capture a preview of a tab's current page for the tab switcher.
+  Future<void> captureThumb(BrowserTab tab) async {
+    if (tab.controller == null || tab.isHome) return;
+    try {
+      final shot = await tab.controller!.takeScreenshot(
+        screenshotConfiguration: ScreenshotConfiguration(compressFormat: CompressFormat.JPEG, quality: 40),
+      );
+      if (shot != null) tab.thumbnail = shot;
+    } catch (_) {}
   }
 
   void closeTab(BrowserTab tab) {

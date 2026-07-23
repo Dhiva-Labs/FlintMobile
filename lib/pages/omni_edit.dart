@@ -22,6 +22,9 @@ class _OmniEditPageState extends State<OmniEditPage> {
   @override
   void initState() {
     super.initState();
+    // Select the whole URL so the first keystroke replaces it (like every
+    // mainstream browser) instead of appending to the existing address.
+    _ctl.selection = TextSelection(baseOffset: 0, extentOffset: _ctl.text.length);
     _update(_ctl.text);
   }
 

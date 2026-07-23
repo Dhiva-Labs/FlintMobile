@@ -64,8 +64,10 @@ class _BrowserShellState extends State<BrowserShell> {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (ctx) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
           Wrap(children: [
             _MenuIcon(bookmarked ? Icons.star : Icons.star_border, bookmarked ? 'Saved' : 'Bookmark',
                 () {
@@ -126,6 +128,7 @@ class _BrowserShellState extends State<BrowserShell> {
                 .then((_) => setState(() {}));
           }),
         ]),
+        ),
       ),
     );
   }
@@ -137,6 +140,8 @@ class _BrowserShellState extends State<BrowserShell> {
   }
 
   Future<void> _openTabs() async {
+    await b.captureThumb(b.active); // fresh preview of the current tab
+    if (!mounted) return;
     await Navigator.of(context).push(MaterialPageRoute(
       fullscreenDialog: true,
       builder: (_) => TabSwitcherPage(browser: b),
@@ -258,17 +263,19 @@ class _Omnibar extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (!tab.isHome)
-                            GestureDetector(
-                              onTap: () => browser.reloadOrStop(),
-                              child: Icon(tab.isLoading ? Icons.close : Icons.refresh,
-                                  size: 19, color: cs.onSurfaceVariant),
-                            ),
                         ]),
                       ),
                     ),
                   ),
                 ),
+                if (!tab.isHome)
+                  IconButton(
+                    onPressed: () => browser.reloadOrStop(),
+                    tooltip: tab.isLoading ? 'Stop' : 'Reload',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(tab.isLoading ? Icons.stop : Icons.refresh,
+                        size: 20, color: cs.onSurfaceVariant),
+                  ),
                 IconButton(
                   onPressed: () => _shieldSheet(context),
                   icon: Badge(

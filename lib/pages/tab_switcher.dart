@@ -96,18 +96,28 @@ class _TabSwitcherPageState extends State<TabSwitcherPage> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.all(8),
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: cs.surface,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
-                      child: Text(
-                        tab.isHome
-                            ? '🔥'
-                            : (tab.host.isNotEmpty ? tab.host[0].toUpperCase() : '?'),
-                        style: TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.bold, color: cs.onSurfaceVariant),
-                      ),
+                      child: tab.thumbnail != null && !tab.isHome
+                          ? Image.memory(
+                              tab.thumbnail!,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                              gaplessPlayback: true,
+                            )
+                          : Text(
+                              tab.isHome
+                                  ? '🔥'
+                                  : (tab.host.isNotEmpty ? tab.host[0].toUpperCase() : '?'),
+                              style: TextStyle(
+                                  fontSize: 26, fontWeight: FontWeight.bold, color: cs.onSurfaceVariant),
+                            ),
                     ),
                   ),
                 ],

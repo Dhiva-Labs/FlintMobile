@@ -4,15 +4,17 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../services/adblock.dart';
 import '../services/downloads.dart';
 import '../services/store.dart';
+import '../services/vpn.dart';
 import 'omni.dart';
 import 'tab.dart';
 
 /// Top-level browser state: the tab list, the active tab, and navigation ops.
 class Browser extends ChangeNotifier {
-  Browser(this.store, this.adblock);
+  Browser(this.store, this.adblock, this.vpn);
 
   final Store store;
   final AdBlock adblock;
+  final Vpn vpn;
   final Downloads downloads = Downloads();
 
   /// UI hook so the shell can show a snackbar when a download starts.

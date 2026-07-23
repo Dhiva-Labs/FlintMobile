@@ -25,6 +25,11 @@ as they do in Chrome, with Flint's privacy layer on top.
   font size and sepia/dark controls.
 - **Omnibox** — one box for search or address, with history & bookmark suggestions.
 - **Bookmarks, history & downloads** — all stored locally on the device.
+- **Secure proxy ("VPN")** — an Opera-style browser VPN: route Flint's traffic
+  through a secure proxy you choose (your own server or a provider's), with a
+  one-tap connect toggle and a server list. Flint runs no servers and logs
+  nothing, so no Dhiva Labs server ever sees your traffic. Browser-scoped, via
+  Android's WebView `ProxyController`.
 - **Find in page, desktop-site toggle, share, dark mode**, and a Flint home speed-dial.
 - **Zero telemetry** — Flint sends nothing about you anywhere.
 

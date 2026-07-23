@@ -45,6 +45,9 @@ class Store {
 
   static Future<Store> open() async => Store._(await SharedPreferences.getInstance());
 
+  /// Direct access for auxiliary services (e.g. the VPN) that persist their own keys.
+  SharedPreferences get raw => _p;
+
   // ---- settings ----
   String get searchEngine => _p.getString('searchEngine') ?? 'ddg';
   set searchEngine(String v) => _p.setString('searchEngine', v);

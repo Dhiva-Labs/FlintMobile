@@ -8,7 +8,6 @@ import 'omni_edit.dart';
 import 'reader_page.dart';
 import 'settings_page.dart';
 import 'tab_switcher.dart';
-import 'vpn_page.dart';
 import 'web_tab.dart';
 
 class BrowserShell extends StatefulWidget {
@@ -65,10 +64,8 @@ class _BrowserShellState extends State<BrowserShell> {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
-      isScrollControlled: true,
       builder: (ctx) => SafeArea(
-        child: SingleChildScrollView(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           Wrap(children: [
             _MenuIcon(bookmarked ? Icons.star : Icons.star_border, bookmarked ? 'Saved' : 'Bookmark',
                 () {
@@ -122,16 +119,6 @@ class _BrowserShellState extends State<BrowserShell> {
               setState(() {});
             },
           ),
-          _MenuRow(
-            Icons.vpn_key_outlined,
-            b.vpn.isOn ? 'Secure proxy · on' : 'Secure proxy (VPN)',
-            () {
-              Navigator.pop(ctx);
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => VpnPage(vpn: b.vpn)))
-                  .then((_) => setState(() {}));
-            },
-          ),
           _MenuRow(Icons.settings_outlined, 'Settings', () {
             Navigator.pop(ctx);
             Navigator.of(context)
@@ -139,7 +126,6 @@ class _BrowserShellState extends State<BrowserShell> {
                 .then((_) => setState(() {}));
           }),
         ]),
-        ),
       ),
     );
   }
@@ -283,11 +269,6 @@ class _Omnibar extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (browser.vpn.isOn)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2),
-                    child: Icon(Icons.vpn_key, size: 18, color: flintOrange),
-                  ),
                 IconButton(
                   onPressed: () => _shieldSheet(context),
                   icon: Badge(

@@ -4,7 +4,6 @@ import 'models/browser.dart';
 import 'pages/browser_shell.dart';
 import 'services/adblock.dart';
 import 'services/store.dart';
-import 'services/vpn.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -12,16 +11,13 @@ Future<void> main() async {
   final store = await Store.open();
   final adblock = AdBlock();
   await adblock.load();
-  final vpn = Vpn(store);
-  await vpn.init();
-  runApp(FlintApp(store: store, adblock: adblock, vpn: vpn));
+  runApp(FlintApp(store: store, adblock: adblock));
 }
 
 class FlintApp extends StatefulWidget {
-  const FlintApp({super.key, required this.store, required this.adblock, required this.vpn});
+  const FlintApp({super.key, required this.store, required this.adblock});
   final Store store;
   final AdBlock adblock;
-  final Vpn vpn;
 
   static FlintAppState of(BuildContext context) =>
       context.findAncestorStateOfType<FlintAppState>()!;
@@ -31,7 +27,7 @@ class FlintApp extends StatefulWidget {
 }
 
 class FlintAppState extends State<FlintApp> {
-  late final Browser browser = Browser(widget.store, widget.adblock, widget.vpn)..init();
+  late final Browser browser = Browser(widget.store, widget.adblock)..init();
 
   void refreshTheme() => setState(() {});
 

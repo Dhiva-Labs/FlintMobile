@@ -5,6 +5,8 @@
   Built-in ad &amp; tracker blocking, private tabs, reader mode — zero telemetry.
 </p>
 
+**Documentation:** step-by-step guides at [learn.dhivalabs.com](https://learn.dhivalabs.com/apps/flint-mobile/): [install](https://learn.dhivalabs.com/apps/flint-mobile/install) · [beginner guide](https://learn.dhivalabs.com/apps/flint-mobile/getting-started) · [troubleshooting](https://learn.dhivalabs.com/apps/flint-mobile/faq).
+
 <p align="center">
   <img src="docs/home.png" width="260">
   &nbsp;&nbsp;
